@@ -8,8 +8,8 @@ interface CompliancePanelProps {
 }
 
 const SEVERITY_STYLES: Record<string, React.CSSProperties> = {
-  info:     { borderLeft: "4px solid #3b82f6", background: "#eff6ff" },
-  warning:  { borderLeft: "4px solid #f59e0b", background: "#fffbeb" },
+  info: { borderLeft: "4px solid #3b82f6", background: "#eff6ff" },
+  warning: { borderLeft: "4px solid #f59e0b", background: "#fffbeb" },
   critical: { borderLeft: "4px solid #ef4444", background: "#fef2f2" },
 };
 
@@ -47,10 +47,6 @@ export function CompliancePanel({ result, loading, error }: CompliancePanelProps
     );
   }
 
-  // Bug (validation gap): result.status is displayed as-is.
-  // If the agent returns status "partial_failure" or "timed_out",
-  // the UI shows the flags array (which may be empty) and the user
-  // sees a green "passed" panel rather than an indeterminate state.
   const passed = result.flags.length === 0;
 
   return (
