@@ -1,15 +1,3 @@
-/**
- * CompliancePanel integration test
- *
- * Tests the full flow: useAgentCheck hook → axonClient → CompliancePanel render.
- * Uses a mocked fetch to avoid real network calls.
- *
- * Known issue: one of the tests is intermittently failing in CI.
- * The customer reported that `npm test` passes locally but fails ~30% of the
- * time on GitHub Actions. The team suspects a timing issue but has not
- * confirmed root cause.
- */
-
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
