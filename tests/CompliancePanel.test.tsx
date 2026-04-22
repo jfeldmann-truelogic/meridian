@@ -19,13 +19,9 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Test 1: happy path
-// ─────────────────────────────────────────────────────────────────────────────
 test("shows PASSED badge when agent returns no flags", async () => {
-  // Health check + agent check
-  mockFetchOnce({ ok: true });           // getAxonHealth
-  mockFetchOnce(MOCK_SUCCESSFUL_RESULT); // runAgentCheck
+  mockFetchOnce({ ok: true });
+  mockFetchOnce(MOCK_SUCCESSFUL_RESULT);
 
   render(<App />);
 
@@ -36,32 +32,19 @@ test("shows PASSED badge when agent returns no flags", async () => {
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Test 2: flag rendering
-// Flaky: this test occasionally times out in CI because waitFor resolves
-// before the second fetch (runAgentCheck) completes. The mock is set up
-// correctly, but the component's useEffect for health check consumes the
-// first mockResolvedValueOnce, and the second may not have fired before the
-// assertion window closes. There is no explicit flush or settled-promise
-// guarantee here.
-// ─────────────────────────────────────────────────────────────────────────────
 test("shows flag count when agent returns flags", async () => {
-  mockFetchOnce({ ok: true });                  // getAxonHealth
-  mockFetchOnce(MOCK_AGENT_GENERATED_RESULT);   // runAgentCheck
+  mockFetchOnce({ ok: true });
+  mockFetchOnce(MOCK_AGENT_GENERATED_RESULT);
 
   render(<App />);
 
   fireEvent.click(screen.getAllByText("Run Compliance Check")[0]);
 
-  // Bug: no `await` on health-check effect; race condition possible
   expect(screen.getByText(/1 FLAG/)).toBeInTheDocument();
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Test 3: network error path
-// ─────────────────────────────────────────────────────────────────────────────
 test("shows error message when agent check fails", async () => {
-  mockFetchOnce({ ok: true });   // getAxonHealth
+  mockFetchOnce({ ok: true });
   global.fetch = jest.fn()
     .mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true }) })
     .mockRejectedValueOnce(new Error("Network error"));
