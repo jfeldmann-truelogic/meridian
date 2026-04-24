@@ -49,5 +49,3 @@ npm start        # local dev server
 npm test         # run tests once (no watch)
 npm run type-check  # TypeScript validation only
 ```
-
-Environment: see `.env.example` for required variables. A `.env` file is included for local development.
