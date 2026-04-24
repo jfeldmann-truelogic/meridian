@@ -51,33 +51,3 @@ npm run type-check  # TypeScript validation only
 ```
 
 Environment: see `.env.example` for required variables. A `.env` file is included for local development.
-
----
-
-## Repository Structure
-
-```
-meridian-dashboard/
-├── public/
-│   └── index.html
-├── src/
-│   ├── __mocks__/
-│   │   └── axon-sdk.ts          # Axon SDK test stub
-│   ├── components/
-│   │   ├── CompliancePanel.tsx  # Renders agent check results
-│   │   └── OrderCard.tsx        # Renders a single order + trigger button
-│   ├── hooks/
-│   │   └── useAgentCheck.ts     # Hook: triggers check, manages state
-│   ├── services/
-│   │   └── axonClient.ts        # HTTP wrapper for Axon platform API
-│   ├── types/
-│   │   └── index.ts             # Shared TypeScript types
-│   ├── App.tsx
-│   └── index.tsx
-├── tests/
-│   └── CompliancePanel.test.tsx
-├── .env
-├── .env.example
-├── package.json
-└── tsconfig.json
-```
