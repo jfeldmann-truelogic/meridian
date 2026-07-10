@@ -1,6 +1,7 @@
 // Regression tests for the "connectivity indicator stuck grey" bug.
 // getAxonHealth previously had no timeout, so a reachable-but-hanging endpoint
 // left the promise pending forever and the indicator stayed grey.
+export {}; // ensure this file is treated as a module under isolatedModules
 
 const OLD_ENV = process.env;
 

@@ -2,6 +2,9 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import App from "../App";
+// These are shared test fixtures (sample agent responses), not a jest
+// automock module, so importing them directly is intentional.
+// eslint-disable-next-line jest/no-mocks-import
 import {
   MOCK_SUCCESSFUL_RESULT,
   MOCK_AGENT_GENERATED_RESULT,
