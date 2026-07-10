@@ -5,6 +5,7 @@ import App from "../App";
 import {
   MOCK_SUCCESSFUL_RESULT,
   MOCK_AGENT_GENERATED_RESULT,
+  MOCK_STATUS_ONLY_VIOLATION,
 } from "../__mocks__/axon-sdk";
 
 type CheckResponse =
@@ -67,6 +68,31 @@ test("shows flag count when agent returns flags", async () => {
   fireEvent.click(screen.getAllByText("Run Compliance Check")[0]);
 
   expect(await screen.findByText(/1 FLAG/)).toBeInTheDocument();
+});
+
+test("does NOT show PASSED when flags are empty but status is not clean", async () => {
+  // Regression for the false-pass bug: an out-of-band violation (problem in
+  // `status`/`summary`, empty `flags`) must surface as NEEDS REVIEW, not PASSED.
+  mockAxon({ kind: "json", body: MOCK_STATUS_ONLY_VIOLATION });
+
+  render(<App />);
+
+  fireEvent.click(screen.getAllByText("Run Compliance Check")[0]);
+
+  expect(await screen.findByText("NEEDS REVIEW")).toBeInTheDocument();
+  expect(screen.queryByText("PASSED")).not.toBeInTheDocument();
+});
+
+test("surfaces an error when the agent response is malformed", async () => {
+  // A malformed response must fail closed (explicit error), never a clean pass.
+  mockAxon({ kind: "json", body: { runId: "x", status: "completed" } });
+
+  render(<App />);
+
+  fireEvent.click(screen.getAllByText("Run Compliance Check")[0]);
+
+  expect(await screen.findByText(/Check failed/)).toBeInTheDocument();
+  expect(screen.queryByText("PASSED")).not.toBeInTheDocument();
 });
 
 test("shows error message when agent check fails", async () => {

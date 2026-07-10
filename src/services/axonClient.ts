@@ -1,4 +1,5 @@
 import { AgentCheckRequest, AgentCheckResult } from "../types";
+import { assertValidAgentCheckResult } from "./compliance";
 
 const ENDPOINT = process.env.REACT_APP_AXON_ENDPOINT;
 const API_KEY = process.env.REACT_APP_AXON_API_KEY;
@@ -38,7 +39,10 @@ export async function runAgentCheck(
     throw new Error(`Agent check failed: ${response.status}`);
   }
 
-  const result = (await response.json()) as AgentCheckResult;
+  const result = await response.json();
+  // Validate the shape at the boundary. A malformed response throws here and
+  // surfaces as an explicit error rather than silently rendering a clean PASS.
+  assertValidAgentCheckResult(result);
   return result;
 }
 
