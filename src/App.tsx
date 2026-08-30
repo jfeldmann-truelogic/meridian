@@ -36,7 +36,11 @@ export default function App() {
   const { loading, result, error, triggerCheck } = useAgentCheck();
 
   useEffect(() => {
-    getAxonHealth().then(({ ok }) => setPlatformOk(ok));
+    // Defense in depth: if the health check ever rejects, resolve the indicator
+    // to "unreachable" (red) rather than leaving it stuck on grey/"Checking…".
+    getAxonHealth()
+      .then(({ ok }) => setPlatformOk(ok))
+      .catch(() => setPlatformOk(false));
   }, []);
 
   function handleRunCheck(order: OrderSummary) {

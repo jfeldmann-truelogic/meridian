@@ -17,9 +17,14 @@ export interface OrderItem {
   description: string;
 }
 
+// Severity levels the agent may attach to a flag, least to most severe.
+// "blocker" is emitted by the live agent (the mock cast it as `any`); the UI
+// must never silently downgrade an unknown or higher severity to "info".
+export type FlagSeverity = "info" | "warning" | "critical" | "blocker";
+
 export interface ComplianceFlag {
   flagId: string;
-  severity: "info" | "warning" | "critical";
+  severity: FlagSeverity;
   message: string;
   ruleId: string;
 }

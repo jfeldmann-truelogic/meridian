@@ -1,5 +1,6 @@
 import React from "react";
 import { AgentCheckResult, ComplianceFlag } from "../types";
+import { classifyOutcome, isKnownSeverity } from "../services/compliance";
 
 interface CompliancePanelProps {
   result: AgentCheckResult | null;
@@ -11,10 +12,15 @@ const SEVERITY_STYLES: Record<string, React.CSSProperties> = {
   info: { borderLeft: "4px solid #3b82f6", background: "#eff6ff" },
   warning: { borderLeft: "4px solid #f59e0b", background: "#fffbeb" },
   critical: { borderLeft: "4px solid #ef4444", background: "#fef2f2" },
+  blocker: { borderLeft: "4px solid #7f1d1d", background: "#fee2e2" },
 };
 
 function FlagCard({ flag }: { flag: ComplianceFlag }) {
-  const style = SEVERITY_STYLES[flag.severity] ?? SEVERITY_STYLES.info;
+  // Fail-closed: an unknown severity is styled as the most severe (blocker),
+  // never silently downgraded to the "info" blue.
+  const style = isKnownSeverity(flag.severity)
+    ? SEVERITY_STYLES[flag.severity]
+    : SEVERITY_STYLES.blocker;
   return (
     <div style={{ ...style, padding: "10px 14px", borderRadius: 4, marginBottom: 8 }}>
       <strong style={{ textTransform: "uppercase", fontSize: 11 }}>
@@ -47,7 +53,20 @@ export function CompliancePanel({ result, loading, error }: CompliancePanelProps
     );
   }
 
-  const passed = result.flags.length === 0;
+  const outcome = classifyOutcome(result);
+  const badge = {
+    passed: { label: "PASSED", background: "#dcfce7", color: "#166534" },
+    flagged: {
+      label: `${result.flags.length} FLAG(S)`,
+      background: "#fef9c3",
+      color: "#854d0e",
+    },
+    needs_review: {
+      label: "NEEDS REVIEW",
+      background: "#fef9c3",
+      color: "#854d0e",
+    },
+  }[outcome];
 
   return (
     <div style={{ padding: 16 }}>
@@ -65,11 +84,11 @@ export function CompliancePanel({ result, loading, error }: CompliancePanelProps
             borderRadius: 12,
             fontSize: 12,
             fontWeight: 600,
-            background: passed ? "#dcfce7" : "#fef9c3",
-            color: passed ? "#166534" : "#854d0e",
+            background: badge.background,
+            color: badge.color,
           }}
         >
-          {passed ? "PASSED" : `${result.flags.length} FLAG(S)`}
+          {badge.label}
         </span>
         <span style={{ fontSize: 12, color: "#9ca3af" }}>run: {result.runId}</span>
         {result.confidence !== undefined && (
@@ -78,6 +97,14 @@ export function CompliancePanel({ result, loading, error }: CompliancePanelProps
           </span>
         )}
       </div>
+
+      {outcome === "needs_review" && (
+        <p style={{ fontSize: 13, color: "#854d0e", marginBottom: 12 }}>
+          Agent returned no structured flags but did not report a clean result
+          (status: <code>{String(result.status)}</code>). Manual review
+          required.
+        </p>
+      )}
 
       {result.summary && (
         <p style={{ fontSize: 14, color: "#374151", marginBottom: 12 }}>
